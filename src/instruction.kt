@@ -28,29 +28,22 @@ object LoadAccToMrr : Instruction()
 
 // 8-bit arithmetic group
 
-data class AddRegToAcc(val source: Int) : Instruction()
-data class AddIntToAcc(val n: Int) : Instruction()
-object AddHlToAcc : Instruction()
-object AddIxToAcc : Instruction()
-object AddIyToAcc : Instruction()
-data class AdcRegToAcc(val source: Int) : Instruction()
-data class AdcIntToAcc(val n: Int) : Instruction()
-object AdcHlToAcc : Instruction()
-object AdcIxToAcc : Instruction()
-object AdcIyToAcc : Instruction()
-data class SubRegToAcc(val source: Int) : Instruction()
-data class SubIntToAcc(val n: Int) : Instruction()
-object SubHlToAcc : Instruction()
-object SubIxToAcc : Instruction()
-object SubIyToAcc : Instruction()
-data class SbcRegToAcc(val source: Int) : Instruction()
-data class SbcIntToAcc(val n: Int) : Instruction()
-object SbcHlToAcc : Instruction()
-object SbcIxToAcc : Instruction()
-object SbcIyToAcc : Instruction()
+data class Add(val source: ArithSrc) : Instruction()
+data class Adc(val source: ArithSrc) : Instruction()
+data class Sub(val source: ArithSrc) : Instruction()
+data class Sbc(val source: ArithSrc) : Instruction()
+data class And(val source: ArithSrc) : Instruction()
+data class Or(val source: ArithSrc) : Instruction()
+data class Xor(val source: ArithSrc) : Instruction()
+data class Compare(val source: ArithSrc) : Instruction()
+data class Increment(val dest: ArithDest) : Instruction()
+data class Decrement(val dest: ArithDest) : Instruction()
 
 // General-purpose arithmetic and CPU control group
 
+object Complement : Instruction()
+object Negate : Instruction()
+object ComplementCarryFlag : Instruction()
 object SetCarryFlag : Instruction()
 object Nop : Instruction()
 object Halt : Instruction()
@@ -84,3 +77,20 @@ object Return : Instruction()
 data class ReturnCond(val condition: Int) : Instruction()
 object ReturnInterrupt : Instruction()
 object ReturnNonmaskInterrupt : Instruction()
+
+// Sources
+
+sealed class ArithSrc
+data class ArithFromReg(val register: Int) : ArithSrc()
+data class ArithFromInt(val n: Int) : ArithSrc()
+object ArithFromHl : ArithSrc()
+data class ArithFromIx(val displacement: Int) : ArithSrc()
+data class ArithFromIy(val displacement: Int) : ArithSrc()
+
+// Destinations
+
+sealed class ArithDest
+data class ArithToReg(val register: Int) : ArithDest()
+object ArithToHl : ArithDest()
+data class ArithToIx(val displacement: Int) : ArithDest()
+data class ArithToIy(val displacement: Int) : ArithDest()
