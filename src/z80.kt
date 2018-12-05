@@ -51,7 +51,7 @@ fun main(args: Array<String>) {
     println("Hello world!")
     println(0b10000000)
 
-    val instruction = 0b01111000 and 0xFF
+    val instruction = memory[programCounter] and 0xFF
 
     if (instruction and 0b11000000 == 0b01000000) {
         // LD r, r'
