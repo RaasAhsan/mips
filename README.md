@@ -4,6 +4,7 @@ This project provides a full-featured environment for Z80 CPUs:
 - An assembler
 - A disassembler
 - An emulator
+- A custom programming language that compiles to Z80 assembly
 
 Kotlin is the choice of language for this codebase for several reasons:
 1. Principled and disciplined language
