@@ -57,8 +57,8 @@ data class And(val src: ArithSrc) : Instruction()
 data class Or(val src: ArithSrc) : Instruction()
 data class Xor(val src: ArithSrc) : Instruction()
 data class Compare(val src: ArithSrc) : Instruction()
-data class Increment(val dest: ArithDest) : Instruction()
-data class Decrement(val dest: ArithDest) : Instruction()
+data class Inc(val dest: ArithDest) : Instruction()
+data class Dec(val dest: ArithDest) : Instruction()
 
 // General-purpose arithmetic and CPU control group
 
@@ -75,6 +75,13 @@ object SetInterruptMode1 : Instruction()
 object SetInterruptMode2 : Instruction()
 
 // 16-bit arithmetic group
+
+data class Inc16RegPair(val pair: Int) : Instruction()
+object IncIx : Instruction()
+object IncIy : Instruction()
+data class Dec16RegPair(val pair: Int) : Instruction()
+object DecIx : Instruction()
+object DecIy : Instruction()
 
 // Jump group
 
