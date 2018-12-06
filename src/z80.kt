@@ -1,3 +1,4 @@
+import java.io.File
 
 //
 // Constants
@@ -10,7 +11,7 @@ val HL: Int = 0b110
 // Memory
 //
 
-val memory: IntArray = intArrayOf(0xFFFF)
+val memory: IntArray = IntArray(0xFFFF)
 
 //
 // Registers
@@ -48,34 +49,31 @@ val mainRegisters: IntArray = intArrayOf(8)
 var flagRegister: Int = 0x00
 
 fun main(args: Array<String>) {
-    println("Hello world!")
-    println(0b10000000)
+    loadProgram("program.hex")
 
-    val instruction = memory[programCounter] and 0xFF
+    var ip = 0
+    var done = false
+    while (!done) {
+        val decoded = decode(ip, memory)
 
-    if (instruction and 0b11000000 == 0b01000000) {
-        // LD r, r'
+        if (decoded != null) {
+            if (decoded.instruction == Nop) {
+                done = true
+            } else {
+                println(decoded.instruction)
+                ip = decoded.nextIp
+            }
+        } else {
+            done = true
+        }
+    }
+}
 
-        val sourceRegister = instruction and 0b111
-        val destinationRegister = instruction shr 3 and 0b111
+fun loadProgram(file: String) {
+    val file = File(file)
+    val bytes = file.readBytes()
 
-        mainRegisters[destinationRegister] = mainRegisters[sourceRegister]
-    } else if (instruction and 0b11111000 == 0b10000000) {
-        // ADD A, r
-
-        val sourceRegister = instruction and 0b111
-
-        val result = mainRegisters[mainAccumulator] + mainRegisters[sourceRegister]
-        mainRegisters[mainAccumulator] = result
-
-        val signBit = if (result < 0) 1 else 0
-        val zeroBit = if (result == 0) 1 else 0
-
-        val flagMask = signBit
-        // TODO: Change flags
-    } else if (instruction == 0xC6) {
-        // ADD A, n
-    } else if (instruction == 0x86) {
-        // ADD A, (HL)
+    bytes.forEachIndexed { index, byte ->
+        memory[index] = byte.toInt() and 0xFF
     }
 }
