@@ -26,6 +26,12 @@ object LoadAccToMrr : Instruction()
 
 // 16-bit load group
 
+// Exchange, Block Transfer and Search Group
+object ExchangeDeHl : Instruction()
+object ExchangeAf : Instruction()
+object ExchangeRegisterPairs : Instruction()
+object ExchangeSpHl : Instruction()
+
 data class Load16HlToMem(val address: Int) : Instruction()
 data class Load16RegToMem(val address: Int, val pair: Int) : Instruction()
 data class Load16IxToMem(val address: Int) : Instruction()
@@ -72,7 +78,7 @@ object SetInterruptMode2 : Instruction()
 // Jump group
 
 data class JumpMem(val address: Int) : Instruction()
-data class JumpMemCond(val address: Int, val condition: Int) : Instruction()
+data class JumpMemCond(val condition: Int, val address: Int) : Instruction()
 data class JumpDisp(val displacement: Int) : Instruction()
 data class JumpDispCarry(val displacement: Int) : Instruction()
 data class JumpDispNoCarry(val displacement: Int) : Instruction()
