@@ -32,6 +32,7 @@ object ExchangeAf : Instruction()
 object ExchangeRegisterPairs : Instruction()
 object ExchangeSpHl : Instruction()
 
+data class Load16MemToHl(val address: Int) : Instruction()
 data class Load16HlToMem(val address: Int) : Instruction()
 data class Load16RegToMem(val address: Int, val pair: Int) : Instruction()
 data class Load16IxToMem(val address: Int) : Instruction()
