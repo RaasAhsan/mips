@@ -5,18 +5,15 @@ class Emulator {
     // 64K memory
     val memory: IntArray = IntArray(0xFFFF)
 
-    // The program counter holds the 16-bit address of the current instruction being fetched from memory.
-    val programCounter: Int = 0x0000
+    // The program counter holds the 16-bit address of the current value being fetched from memory.
+    var pc: Int = 0x0000
 
     // The stack pointer holds the 16-bit address of the current top of the stack located anywhere in RAM.
-    var stackPointer: Int = 0x0000
-
-    // The instruction register holds the 8-bit value of an instruction read from memory.
-    var instructionRegister: Int = 0x00
+    var sp: Int = 0x0000
 
     // The independent index registers hold a 16-bit base address used in indexed addressing modes.
-    val indexXRegister: Int = 0x0000
-    val indexYRegister: Int = 0x0000
+    val ix: Int = 0x0000
+    val iy: Int = 0x0000
 
     val mainRegisters: IntArray = intArrayOf(8)
 
@@ -37,17 +34,16 @@ class Emulator {
     var flagRegister: Int = 0x00
 
     fun start() {
-        var ip = 0
         var done = false
         while (!done) {
-            val decoded = decode(ip, memory)
+            val decoded = decode(pc, memory)
 
             if (decoded != null) {
                 if (decoded.instruction == Nop) {
                     done = true
                 } else {
                     println(decoded.instruction)
-                    ip = decoded.nextIp
+                    pc = decoded.nextPc
                 }
             } else {
                 done = true

@@ -1,17 +1,17 @@
 // Disassembler for Z80 Assembly
 
-data class Decoded(val instruction: Instruction, val nextIp: Int)
+data class Decoded(val instruction: Instruction, val nextPc: Int)
 
-data class Opcode(val instruction: Int) {
+data class Opcode(val value: Int) {
 
     // Components are specified here: http://www.z80.info/decoding.htm
 
     // bits 7-6
-    val x: Int = instruction.and(0b11000000).shr(6)
+    val x: Int = value.and(0b11000000).shr(6)
     // bits 5-3
-    val y: Int = instruction.and(0b00111000).shr(3)
+    val y: Int = value.and(0b00111000).shr(3)
     // bits 2-0
-    val z: Int = instruction.and(0b00000111)
+    val z: Int = value.and(0b00000111)
     // bit 3
     val p: Int = y.shr(1)
     // bits 5-4
@@ -19,171 +19,131 @@ data class Opcode(val instruction: Int) {
 
 }
 
-// Return: instruction, address of next instruction
-fun decode(ip: Int, memory: IntArray): Decoded? {
-    val byte = memory[ip]
+// Return: value, address of next value
+fun decode(pc: Int, memory: IntArray): Decoded? {
+    val opcode = Opcode(memory[pc])
 
-    // If the byte is a single, contained instruction then can always do ip + 1
-
-    return when (byte) {
-        0xCB -> null
-        0xED -> {
-            val opcode = Opcode(memory[ip + 1])
-
-            when (opcode.x) {
-                1 -> when (opcode.z) {
-                    4 -> Decoded(Negate, ip + 2)
-                    else -> null
-                }
-                else -> null
-            }
+    val result =
+        //
+        // 8-bit load group
+        //
+        if (opcode.x == 0b01 && isRegisterABCDEHL(opcode.y) && isRegisterABCDEHL(opcode.z)) { // LD r, r'
+            Decoded(LoadRegToReg(opcode.y, opcode.x), pc + 1)
+        } else if (opcode.x == 0b00 && isRegisterABCDEHL(opcode.y) && opcode.z == 0b110) { // LD r, n
+            Decoded(LoadIntToReg(opcode.y, memory[pc + 1]), pc + 2)
+        } else if (opcode.x == 0b01 && isRegisterABCDEHL(opcode.y) && opcode.z == 0b110) { // LD r, (HL)
+            Decoded(LoadHlToReg(opcode.y), pc + 2)
+        } else if (false) { // LD r, (IX+d)
+            null
+        } else if (false) { // LD r, (IY+d)
+            null
+        } else if (opcode.x == 0b01 && opcode.y == 0b110 && isRegisterABCDEHL(opcode.z)) { // LD (HL), r
+            Decoded(LoadRegToHl(opcode.z), pc + 1)
+        } else if (false) { // LD (IX+d), r
+            null
+        } else if (false) { // LD (IY+d), r
+            null
+        } else if (opcode.value == 0b00110110) { // LD (HL), n
+            Decoded(LoadIntToHl(memory[pc + 1]), pc + 2)
+        } else if (false) { // LD (IX+d), n
+            null
+        } else if (false) { // LD (IY+d), n
+            null
+        } else if (opcode.value == 0b00001010) { // LD A, (BC)
+            Decoded(LoadBcToAcc, pc + 1)
+        } else if (opcode.value == 0b00011010) { // LD A, (DE)
+            Decoded(LoadBcToAcc, pc + 1)
+        } else if (opcode.value == 0b00111010) { // LD A, (nn)
+            val addr = read16BitsLowHigh(memory, pc + 1)
+            Decoded(LoadMemToAcc(addr), pc + 3)
+        } else if (opcode.value == 0b00000010) { // LD (BC), A
+            Decoded(LoadAccToBc, pc + 1)
+        } else if (opcode.value == 0b00010010) { // LD (DE), A
+            Decoded(LoadAccToDe, pc + 1)
+        } else if (opcode.value == 0b00110010) { // LD (nn), A
+            val addr = read16BitsLowHigh(memory, pc + 1)
+            Decoded(LoadAccToMem(addr), pc + 3)
+        } else if (false) { // LD A, I
+            null
+        } else if (false) { // LD A, R
+            null
+        } else if (false) { // LD I, A
+            null
+        } else if (false) { // LD R, A
+            null
         }
-        0xDD -> null
-        0xFD -> null
-        else -> {
-            val opcode = Opcode(byte)
-
-            when (opcode.x) {
-                0 -> when (opcode.z) {
-                    0 -> when (opcode.y) {
-                        0 -> Decoded(Nop, ip + 1)
-                        1 -> Decoded(ExchangeAf, ip + 1)
-                        2 -> Decoded(JumpDispNoZero(memory[ip + 1]), ip + 2)
-                        3 -> Decoded(JumpDisp(memory[ip + 1]), ip + 2)
-                        else -> null
-                    }
-                    2 -> when (opcode.q) {
-                        0 -> when (opcode.p) {
-                            0 -> Decoded(LoadAccToBc, ip + 1)
-                            1 -> Decoded(LoadAccToDe, ip + 1)
-                            2 -> {
-                                val addr = read16BitOperand(memory, ip + 1)
-
-                                Decoded(Load16HlToMem(addr), ip + 3)
-                            }
-                            3 -> {
-                                val addr = read16BitOperand(memory, ip + 1)
-
-                                Decoded(LoadAccToMem(addr), ip + 3)
-                            }
-                            else -> null
-                        }
-                        1 -> when (opcode.p) {
-                            0 -> Decoded(LoadBcToAcc, ip + 1)
-                            1 -> Decoded(LoadDeToAcc, ip + 1)
-                            2 -> {
-                                val addr = read16BitOperand(memory, ip + 1)
-
-                                Decoded(Load16MemToHl(addr), ip + 3)
-                            }
-                            3 -> {
-                                val addr = read16BitOperand(memory, ip + 1)
-
-                                Decoded(LoadMemToAcc(addr), ip + 3)
-                            }
-                            else -> null
-                        }
-                        else -> null
-                    }
-                    3 -> when (opcode.q) {
-                        0 -> Decoded(Inc16RegPair(opcode.p), ip + 1)
-                        1 -> Decoded(Dec16RegPair(opcode.p), ip + 1)
-                        else -> null
-                    }
-                    4 -> Decoded(Inc(ArithToReg(opcode.y)), ip + 1)
-                    5 -> Decoded(Dec(ArithToReg(opcode.y)), ip + 1)
-                    6 -> Decoded(LoadIntToReg(opcode.y, memory[ip + 1]), ip + 2)
-                    7 -> when (opcode.y) {
-                        0 -> null
-                        5 -> Decoded(Complement, ip + 1)
-                        6 -> Decoded(SetCarryFlag, ip + 1)
-                        7 -> Decoded(ComplementCarryFlag, ip + 1)
-                        else -> null
-                    }
-                    else -> null
-                }
-                1 -> when (opcode.z) {
-                    6 -> when (opcode.y) {
-                        6 -> Decoded(Halt, ip + 1)
-                        else -> null
-                    }
-                    else -> Decoded(LoadRegToReg(opcode.y, opcode.z), ip + 1)
-                }
-                2 -> when (opcode.y) {
-                    0 -> Decoded(Add(ArithFromReg(opcode.z)), ip + 1)
-                    1 -> Decoded(Adc(ArithFromReg(opcode.z)), ip + 1)
-                    2 -> Decoded(Sub(ArithFromReg(opcode.z)), ip + 1)
-                    3 -> Decoded(Sbc(ArithFromReg(opcode.z)), ip + 1)
-                    4 -> Decoded(And(ArithFromReg(opcode.z)), ip + 1)
-                    5 -> Decoded(Xor(ArithFromReg(opcode.z)), ip + 1)
-                    6 -> Decoded(Or(ArithFromReg(opcode.z)), ip + 1)
-                    7 -> Decoded(Compare(ArithFromReg(opcode.z)), ip + 1)
-                    else -> null
-                }
-                3 -> when (opcode.z) {
-                    1 -> when (opcode.q) {
-                        0 -> Decoded(Pop(opcode.p), ip + 1)
-                        1 -> when (opcode.p) {
-                            0 -> Decoded(Return, ip + 1)
-                            1 -> Decoded(ExchangeRegisterPairs, ip + 1)
-                            2 -> Decoded(JumpHl, ip + 1)
-                            3 -> Decoded(Load16HlToSp, ip + 1)
-                            else -> null
-                        }
-                        else -> null
-                    }
-                    2 -> {
-                        val addr = read16BitOperand(memory, ip + 1)
-
-                        Decoded(JumpMemCond(opcode.y, addr), ip + 3)
-                    }
-                    3 -> when (opcode.y) {
-                        0 -> {
-                            val addr = read16BitOperand(memory, ip + 1)
-
-                            Decoded(JumpMem(addr), ip + 3)
-                        }
-                        4 -> Decoded(ExchangeSpHl, ip + 1)
-                        5 -> Decoded(ExchangeDeHl, ip + 1)
-                        else -> null
-                    }
-                    4 -> {
-                        val addr = read16BitOperand(memory, ip + 1)
-
-                        Decoded(CallMemCond(addr, opcode.y), ip + 3)
-                    }
-                    5 -> when (opcode.q) {
-                        0 -> Decoded(Push(opcode.p), ip + 1)
-                        1 -> when (opcode.p) {
-                            0 -> {
-                                val addr = read16BitOperand(memory, ip + 1)
-
-                                Decoded(CallMem(addr), ip + 3)
-                            }
-                            else -> null
-                        }
-                        else -> null
-                    }
-                    6 -> when(opcode.y) { // TODO: ALU table
-                        0 -> Decoded(Add(ArithFromInt(memory[ip + 1])), ip + 2)
-                        1 -> Decoded(Adc(ArithFromInt(memory[ip + 1])), ip + 2)
-                        2 -> Decoded(Sub(ArithFromInt(memory[ip + 1])), ip + 2)
-                        3 -> Decoded(Sbc(ArithFromInt(memory[ip + 1])), ip + 2)
-                        4 -> Decoded(And(ArithFromInt(memory[ip + 1])), ip + 2)
-                        5 -> Decoded(Xor(ArithFromInt(memory[ip + 1])), ip + 2)
-                        6 -> Decoded(Or(ArithFromInt(memory[ip + 1])), ip + 2)
-                        7 -> Decoded(Compare(ArithFromInt(memory[ip + 1])), ip + 2)
-                        else -> null
-                    }
-                    else -> null
-                }
-                else -> null
-            }
+        //
+        // 16-bit load group
+        //
+        else if (opcode.x == 0b11 && opcode.q == 0b1 && opcode.z == 0b001) { // LD dd, nn
+            val nn = read16BitsLowHigh(memory, pc + 1)
+            Decoded(Load16IntToRegPair(opcode.p, nn), pc + 3)
+        } else if (false) { // LD IX, nn
+            null
+        } else if (false) { // LD IY, nn
+            null
+        } else if (opcode.value == 0b00101010) { // LD HL, (nn)
+            val addr = read16BitsLowHigh(memory, pc + 1)
+            Decoded(Load16MemToHl(addr), pc + 3)
+        } else if (false) { // LD dd, (nn)
+            null
+        } else if (false) { // LD IX, (nn)
+            null
+        } else if (false) { // LD IY, (nn)
+            null
+        } else if (opcode.value == 0b00101010) { // LD (nn), HL
+            val addr = read16BitsLowHigh(memory, pc + 1)
+            Decoded(Load16HlToMem(addr), pc + 3)
+        } else if (false) { // LD (nn), dd
+            null
+        } else if (false) { // LD (nn), IX
+            null
+        } else if (false) { // LD (nn), IY
+            null
+        } else if (opcode.value == 0b11111001) { // LD SP, HL
+            Decoded(Load16HlToSp, pc + 1)
+        } else if (false) { // LD SP, IX
+            null
+        } else if (false) { // LD SP, IY
+            null
+        } else if (opcode.x == 0b11 && opcode.q == 0b0 && opcode.z == 0b101) { // PUSH qq
+            Decoded(Push(opcode.q), pc + 1)
+        } else if (false) { // PUSH IX
+            null
+        } else if (false) { // PUSH IY
+            null
+        } else if (opcode.x == 0b11 && opcode.q == 0b0 && opcode.z == 0b001) { // POP qq
+            Decoded(Pop(opcode.q), pc + 1)
+        } else if (false) { // POP IX
+            null
+        } else if (false) { // POP IY
+            null
         }
-    }
+        //
+        // Exchange, Block Transfer, and Search Group
+        //
+        else {
+            null
+        }
+
+    return result
 }
 
-fun read16BitOperand(memory: IntArray, index: Int): Int {
+// operand is a 3-bit value
+/*
+ * A - 111
+ * B - 000
+ * C - 001
+ * D - 010
+ * E - 011
+ * H - 100
+ * L - 101
+ */
+private fun isRegisterABCDEHL(operand: Int): Boolean {
+    return operand != 0b110
+}
+
+private fun read16BitsLowHigh(memory: IntArray, index: Int): Int {
     val lo = memory[index]
     val hi = memory[index + 1]
 
