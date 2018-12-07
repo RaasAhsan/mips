@@ -25,13 +25,6 @@ object LoadAccToIv : Instruction()
 object LoadAccToMrr : Instruction()
 
 // 16-bit load group
-
-// Exchange, Block Transfer and Search Group
-object ExchangeDeHl : Instruction()
-object ExchangeAf : Instruction()
-object ExchangeRegisterPairs : Instruction()
-object ExchangeSpHl : Instruction()
-
 data class Load16IntToRegPair(val rp: Int, val nn: Int) : Instruction()
 data class Load16MemToHl(val address: Int) : Instruction()
 data class Load16HlToMem(val address: Int) : Instruction()
@@ -47,6 +40,20 @@ object PushIy : Instruction()
 data class Pop(val pair: Int) : Instruction()
 object PopIx : Instruction()
 object PopIy : Instruction()
+
+// Exchange, Block Transfer and Search Group
+object ExchangeDeHl : Instruction()
+object ExchangeAf : Instruction()
+object ExchangeRegisterPairs : Instruction()
+object ExchangeSpHl : Instruction()
+object Ldi : Instruction()
+object Ldir : Instruction()
+object Ldd : Instruction()
+object Lddr : Instruction()
+object Cpi : Instruction()
+object Cpir : Instruction()
+object Cpd : Instruction()
+object Cpdr : Instruction()
 
 // 8-bit arithmetic group
 

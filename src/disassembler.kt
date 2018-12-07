@@ -122,7 +122,37 @@ fun decode(pc: Int, memory: IntArray): Decoded? {
         //
         // Exchange, Block Transfer, and Search Group
         //
-        else {
+        else if (opcode.value == 0b11101011) { // EX DE, HL
+            Decoded(ExchangeDeHl, pc + 1)
+        } else if (opcode.value == 0b00001000) { // EX AF, AF'
+            Decoded(ExchangeAf, pc + 1)
+        } else if (opcode.value == 0b11011001) { // EXX
+            Decoded(ExchangeRegisterPairs, pc + 1)
+        } else if (opcode.value == 0b11011001) { // EX (SP), HL
+            Decoded(ExchangeSpHl, pc + 1)
+        } else if (false) { // EX (SP), IX
+            null
+        } else if (false) { // EX (SP), IY
+            null
+        }
+        //
+        // 8-bit arithmetic group
+        //
+        else if (opcode.x == 0b10 && opcode.y == 0b000 && isRegisterABCDEHL(opcode.z)) { // ADD A, r
+            Decoded(Add(ArithFromReg(opcode.z)), pc + 1)
+        } else if (opcode.value == 0b11000110) { // ADD A, n
+            Decoded(Add(ArithFromInt(memory[pc + 1])), pc + 2)
+        } else if (opcode.value == 0b10000110) { // ADD A, (HL)
+            Decoded(Add(ArithFromHl), pc + 1)
+        } else if (false) { // ADD A, (IX + d)
+            null
+        } else if (false) { // ADD A, (IY + d)
+            null
+        } else if (opcode.x == 0b00 && isRegisterABCDEHL(opcode.y) && opcode.z == 0b100) { // INC r
+            Decoded(Inc(ArithToReg(opcode.y)), pc + 1)
+        } else if (opcode.value == 0b00110100) { // INC (HL)
+            Decoded(Inc(ArithToHl), pc + 1)
+        } else {
             null
         }
 
