@@ -28,13 +28,14 @@ class Emulator {
     // 64K memory
     val memory: IntArray = IntArray(0xFFFF)
 
-    // The program counter holds the 16-bit address of the current value being fetched from memory.
-    var pc: Int = 0x0000
+    // The program counter holds the 32-bit address of the current instruction word fetched from memory.
+    var pc: Int = 0x00000000
 
-    // The stack pointer holds the 16-bit address of the current top of the stack located anywhere in RAM.
-    var sp: Int = 0x0000
+    // The stack pointer holds the 32-bit address of the current top of the stack located anywhere in RAM.
+    var sp: Int = 0x00000000
 
-    val mainRegisters: IntArray = intArrayOf(8)
+    val gpr: IntArray = intArrayOf(32)
+    val fpr: IntArray = intArrayOf(32)
 
     fun start() {
         var done = false

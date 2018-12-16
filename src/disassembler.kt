@@ -12,14 +12,3 @@ fun decode(pc: Int, memory: IntArray): Decoded? {
 
     return null
 }
-
-private fun isRegisterABCDEHL(operand: Int): Boolean {
-    return operand != 0b110
-}
-
-private fun read16BitsLowHigh(memory: IntArray, index: Int): Int {
-    val lo = memory[index]
-    val hi = memory[index + 1]
-
-    return hi.shl(8) + lo
-}
