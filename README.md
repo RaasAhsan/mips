@@ -1,10 +1,10 @@
-# z80
+# mips
 
-This project provides a full-featured environment for Z80 CPUs:
+This project provides a full-featured environment for MIPS CPUs:
 - An assembler
 - A disassembler
 - An emulator with various mock I/O components
-- A programming language named Ciel that compiles to Z80 assembly
+- A programming language named Ciel that compiles to MIPS assembly
 
 Kotlin is the choice of language for this codebase for several reasons:
 1. Principled and disciplined language
@@ -13,7 +13,7 @@ Kotlin is the choice of language for this codebase for several reasons:
 
 ## Ciel
 
-Ciel is a toy programming language built to compile to Z80. This section will describe its features. Its grammar and operational semantics will be described in another file.
+Ciel is a toy programming language built to compile to MIPS. This section will describe its features. Its grammar and operational semantics will be described in another file.
 
 The language will change often, so programs are not guaranteed to be source backwards compatible.
 
