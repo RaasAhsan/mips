@@ -50,6 +50,34 @@ fun decode(pc: Int, memory: IntArray): Decoded? {
             // LD (nn), dd
             val addr = read16BitsLowHigh(memory, pc + 2)
             Decoded(Load16RegPairToMem(nextOpcode.p, addr), pc + 4)
+        }
+
+        // Exchange, Block Transfer, and Search Group
+
+        else if (nextOpcode.value == 0xA0) {
+            // LDI
+            Decoded(Ldi, pc + 2)
+        } else if (nextOpcode.value == 0xB0) {
+            // LDIR
+            Decoded(Ldir, pc + 2)
+        } else if (nextOpcode.value == 0xA8) {
+            // LDD
+            Decoded(Ldd, pc + 2)
+        } else if (nextOpcode.value == 0xB8) {
+            // LDDR
+            Decoded(Lddr, pc + 2)
+        } else if (nextOpcode.value == 0xA1) {
+            // CPI
+            Decoded(Cpi, pc + 2)
+        } else if (nextOpcode.value == 0xB1) {
+            // CPIR
+            Decoded(Cpir, pc + 2)
+        } else if (nextOpcode.value == 0xA9) {
+            // CPD
+            Decoded(Cpd, pc + 2)
+        } else if (nextOpcode.value == 0xB9) {
+            // CPDR
+            Decoded(Cpdr, pc + 2)
         } else {
             null
         }
@@ -89,6 +117,13 @@ fun decode(pc: Int, memory: IntArray): Decoded? {
         } else if (nextOpcode.value == 0xE1) {
             // POP IX
             Decoded(PopIx, pc + 2)
+        }
+
+        // Exchange, Block Transfer, and Search Group
+
+        else if (nextOpcode.value == 0xE3) {
+            // EX (SP), IX
+            Decoded(ExchangeSpIx, pc + 2)
         } else {
             null
         }
@@ -128,6 +163,13 @@ fun decode(pc: Int, memory: IntArray): Decoded? {
         } else if (nextOpcode.value == 0xE1) {
             // POP IY
             Decoded(PopIy, pc + 2)
+        }
+
+        // Exchange, Block Transfer, and Search Group
+
+        else if (nextOpcode.value == 0xE3) {
+            // EX (SP), IX
+            Decoded(ExchangeSpIy, pc + 2)
         } else {
             null
         }
@@ -183,57 +225,36 @@ fun decode(pc: Int, memory: IntArray): Decoded? {
             // LD (nn), HL
             val addr = read16BitsLowHigh(memory, pc + 1)
             Decoded(Load16HlToMem(addr), pc + 3)
-        } else if (false) {
-            // LD (nn), dd
-            null
-        } else if (false) {
-            // LD (nn), IX
-            null
-        } else if (false) {
-            // LD (nn), IY
-            null
         } else if (opcode.value == 0b11111001) {
             // LD SP, HL
             Decoded(Load16HlToSp, pc + 1)
-        } else if (false) {
-            // LD SP, IX
-            null
-        } else if (false) {
-            // LD SP, IY
-            null
         } else if (opcode.x == 0b11 && opcode.q == 0b0 && opcode.z == 0b101) {
             // PUSH qq
             Decoded(Push(opcode.q), pc + 1)
-        } else if (false) {
-            // PUSH IX
-            null
-        } else if (false) {
-            // PUSH IY
-            null
         } else if (opcode.x == 0b11 && opcode.q == 0b0 && opcode.z == 0b001) {
             // POP qq
             Decoded(Pop(opcode.q), pc + 1)
-        } else if (false) {
-            // POP IX
-            null
-        } else if (false) {
-            // POP IY
-            null
         }
         //
         // Exchange, Block Transfer, and Search Group
         //
-        else if (opcode.value == 0b11101011) { // EX DE, HL
+        else if (opcode.value == 0xEB) {
+            // EX DE, HL
             Decoded(ExchangeDeHl, pc + 1)
-        } else if (opcode.value == 0b00001000) { // EX AF, AF'
+        } else if (opcode.value == 0x08) {
+            // EX AF, AF'
             Decoded(ExchangeAf, pc + 1)
-        } else if (opcode.value == 0b11011001) { // EXX
+        } else if (opcode.value == 0xD9) {
+            // EXX
             Decoded(ExchangeRegisterPairs, pc + 1)
-        } else if (opcode.value == 0b11011001) { // EX (SP), HL
+        } else if (opcode.value == 0xE3) {
+            // EX (SP), HL
             Decoded(ExchangeSpHl, pc + 1)
-        } else if (false) { // EX (SP), IX
+        } else if (false) {
+            // EX (SP), IX
             null
-        } else if (false) { // EX (SP), IY
+        } else if (false) {
+            // EX (SP), IY
             null
         }
         //
