@@ -1,5 +1,10 @@
 import java.io.File
 
+/*
+ * A register file is a collection of high-speed storage cells located inside the CPU.
+ * General-purpose registers and special-purpose registers (IR, PC)
+ */
+
 class Emulator {
 
     // 64K memory
