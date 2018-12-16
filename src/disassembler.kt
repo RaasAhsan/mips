@@ -23,100 +23,201 @@ data class Opcode(val value: Int) {
 fun decode(pc: Int, memory: IntArray): Decoded? {
     val opcode = Opcode(memory[pc])
 
-    val result =
-        //
+    // TODO: Decode function per prefix
+    return if (opcode.value == 0xED) {
+        val nextOpcode = Opcode(memory[pc + 1])
+
         // 8-bit load group
-        //
-        if (opcode.x == 0b01 && isRegisterABCDEHL(opcode.y) && isRegisterABCDEHL(opcode.z)) { // LD r, r'
+        if (nextOpcode.value == 0x57) {
+            // LD A, I
+            Decoded(LoadIToA, pc + 2)
+        } else if (nextOpcode.value == 0x5F) {
+            // LD A, R
+            Decoded(LoadRToA, pc + 2)
+        } else if (nextOpcode.value == 0x47) {
+            // LD I, A
+            Decoded(LoadAToI, pc + 2)
+        } else if (nextOpcode.value == 0x4F) {
+            // LD R, A
+            Decoded(LoadAToR, pc + 2)
+        }
+        // 16-bit load group
+        else if (nextOpcode.x == 0b01 && nextOpcode.q == 0b1 && nextOpcode.z == 0b011) {
+            // LD dd, (nn)
+            val addr = read16BitsLowHigh(memory, pc + 2)
+            Decoded(Load16MemToRegPair(nextOpcode.p, addr), pc + 4)
+        } else if (nextOpcode.x == 0b01 && nextOpcode.q == 0b0 && nextOpcode.z == 0b011) {
+            // LD (nn), dd
+            val addr = read16BitsLowHigh(memory, pc + 2)
+            Decoded(Load16RegPairToMem(nextOpcode.p, addr), pc + 4)
+        } else {
+            null
+        }
+    } else if (opcode.value == 0xDD) {
+        val nextOpcode = Opcode(memory[pc + 1])
+
+        // 8-bit load group
+        if (nextOpcode.x == 0b01 && isRegisterABCDEHL(nextOpcode.y) && nextOpcode.z == 0b110) {
+            // LD r, (IX+d)
+            Decoded(LoadIxToReg(nextOpcode.y, memory[pc + 2]), pc + 3)
+        } else if (nextOpcode.x == 0b01 && nextOpcode.y == 0b110 && isRegisterABCDEHL(nextOpcode.z)) {
+            // LD (IX+d), r
+            Decoded(LoadRegToIx(nextOpcode.z, memory[pc + 2]), pc + 3)
+        } else if (nextOpcode.value == 0x36) {
+            // LD (IX+d), n
+            Decoded(LoadIntToIx(memory[pc + 2], memory[pc + 3]), pc + 4)
+        }
+        // 16-bit load group
+        else if (nextOpcode.value == 0x21) {
+            // LD IX, nn
+            val n = read16BitsLowHigh(memory, pc + 2)
+            Decoded(Load16IntToIx(n), pc + 4)
+        } else if (nextOpcode.value == 0x2A) {
+            // LD IX, (nn)
+            val n = read16BitsLowHigh(memory, pc + 2)
+            Decoded(Load16MemToIx(n), pc + 4)
+        } else if (nextOpcode.value == 0x22) {
+            // LD (nn), IX
+            val n = read16BitsLowHigh(memory, pc + 2)
+            Decoded(Load16IxToMem(n), pc + 4)
+        } else if (nextOpcode.value == 0xF9) {
+            // LD SP, IX
+            Decoded(Load16IxToSp, pc + 2)
+        } else if (nextOpcode.value == 0xE5) {
+            // PUSH IX
+            Decoded(PushIx, pc + 2)
+        } else if (nextOpcode.value == 0xE1) {
+            // POP IX
+            Decoded(PopIx, pc + 2)
+        } else {
+            null
+        }
+    } else if (opcode.value == 0xFD) {
+        val nextOpcode = Opcode(memory[pc + 1])
+
+        // 8-bit load group
+        if (nextOpcode.x == 0b01 && isRegisterABCDEHL(nextOpcode.y) && nextOpcode.z == 0b110) {
+            // LD r, (IY+d)
+            Decoded(LoadIyToReg(nextOpcode.y, memory[pc + 2]), pc + 3)
+        } else if (nextOpcode.x == 0b01 && nextOpcode.y == 0b110 && isRegisterABCDEHL(nextOpcode.z)) {
+            // LD (IY+d), r
+            Decoded(LoadRegToIy(nextOpcode.z, memory[pc + 2]), pc + 3)
+        } else if (nextOpcode.value == 0x36) {
+            // LD (IY+d), n
+            Decoded(LoadIntToIy(memory[pc + 2], memory[pc + 3]), pc + 4)
+        }
+        // 16-bit load group
+        else if (nextOpcode.value == 0x21) {
+            // LD IX, nn
+            val n = read16BitsLowHigh(memory, pc + 2)
+            Decoded(Load16IntToIy(n), pc + 4)
+        } else if (nextOpcode.value == 0x2A) {
+            // LD IY, (nn)
+            val n = read16BitsLowHigh(memory, pc + 2)
+            Decoded(Load16MemToIy(n), pc + 4)
+        } else if (nextOpcode.value == 0x22) {
+            // LD (nn), IY
+            val n = read16BitsLowHigh(memory, pc + 2)
+            Decoded(Load16IyToMem(n), pc + 4)
+        } else if (nextOpcode.value == 0xF9) {
+            // LD SP, IY
+            Decoded(Load16IyToSp, pc + 2)
+        } else if (nextOpcode.value == 0xE5) {
+            // PUSH IY
+            Decoded(PushIy, pc + 2)
+        } else if (nextOpcode.value == 0xE1) {
+            // POP IY
+            Decoded(PopIy, pc + 2)
+        } else {
+            null
+        }
+    } else {
+        if (opcode.x == 0b01 && isRegisterABCDEHL(opcode.y) && isRegisterABCDEHL(opcode.z)) {
+            // LD r, r'
             Decoded(LoadRegToReg(opcode.y, opcode.x), pc + 1)
-        } else if (opcode.x == 0b00 && isRegisterABCDEHL(opcode.y) && opcode.z == 0b110) { // LD r, n
+        } else if (opcode.x == 0b00 && isRegisterABCDEHL(opcode.y) && opcode.z == 0b110) {
+            // LD r, n
             Decoded(LoadIntToReg(opcode.y, memory[pc + 1]), pc + 2)
-        } else if (opcode.x == 0b01 && isRegisterABCDEHL(opcode.y) && opcode.z == 0b110) { // LD r, (HL)
+        } else if (opcode.x == 0b01 && isRegisterABCDEHL(opcode.y) && opcode.z == 0b110) {
+            // LD r, (HL)
             Decoded(LoadHlToReg(opcode.y), pc + 2)
-        } else if (false) { // LD r, (IX+d)
-            null
-        } else if (false) { // LD r, (IY+d)
-            null
-        } else if (opcode.x == 0b01 && opcode.y == 0b110 && isRegisterABCDEHL(opcode.z)) { // LD (HL), r
+        } else if (opcode.x == 0b01 && opcode.y == 0b110 && isRegisterABCDEHL(opcode.z)) {
+            // LD (HL), r
             Decoded(LoadRegToHl(opcode.z), pc + 1)
-        } else if (false) { // LD (IX+d), r
-            null
-        } else if (false) { // LD (IY+d), r
-            null
-        } else if (opcode.value == 0b00110110) { // LD (HL), n
+        } else if (opcode.value == 0b00110110) {
+            // LD (HL), n
             Decoded(LoadIntToHl(memory[pc + 1]), pc + 2)
-        } else if (false) { // LD (IX+d), n
-            null
-        } else if (false) { // LD (IY+d), n
-            null
-        } else if (opcode.value == 0b00001010) { // LD A, (BC)
+        } else if (opcode.value == 0x0A) {
+            // LD A, (BC)
             Decoded(LoadBcToAcc, pc + 1)
-        } else if (opcode.value == 0b00011010) { // LD A, (DE)
-            Decoded(LoadBcToAcc, pc + 1)
-        } else if (opcode.value == 0b00111010) { // LD A, (nn)
+        } else if (opcode.value == 0x1A) {
+            // LD A, (DE)
+            Decoded(LoadDeToAcc, pc + 1)
+        } else if (opcode.value == 0x3A) {
+            // LD A, (nn)
             val addr = read16BitsLowHigh(memory, pc + 1)
             Decoded(LoadMemToAcc(addr), pc + 3)
-        } else if (opcode.value == 0b00000010) { // LD (BC), A
+        } else if (opcode.value == 0x02) {
+            // LD (BC), A
             Decoded(LoadAccToBc, pc + 1)
-        } else if (opcode.value == 0b00010010) { // LD (DE), A
+        } else if (opcode.value == 0x12) {
+            // LD (DE), A
             Decoded(LoadAccToDe, pc + 1)
-        } else if (opcode.value == 0b00110010) { // LD (nn), A
+        } else if (opcode.value == 0x32) {
+            // LD (nn), A
             val addr = read16BitsLowHigh(memory, pc + 1)
             Decoded(LoadAccToMem(addr), pc + 3)
-        } else if (false) { // LD A, I
-            null
-        } else if (false) { // LD A, R
-            null
-        } else if (false) { // LD I, A
-            null
-        } else if (false) { // LD R, A
-            null
         }
         //
         // 16-bit load group
         //
-        else if (opcode.x == 0b11 && opcode.q == 0b1 && opcode.z == 0b001) { // LD dd, nn
+        else if (opcode.x == 0b11 && opcode.q == 0b1 && opcode.z == 0b001) {
+            // LD dd, nn
             val nn = read16BitsLowHigh(memory, pc + 1)
             Decoded(Load16IntToRegPair(opcode.p, nn), pc + 3)
-        } else if (false) { // LD IX, nn
-            null
-        } else if (false) { // LD IY, nn
-            null
-        } else if (opcode.value == 0b00101010) { // LD HL, (nn)
+        } else if (opcode.value == 0x2A) {
+            // LD HL, (nn)
             val addr = read16BitsLowHigh(memory, pc + 1)
             Decoded(Load16MemToHl(addr), pc + 3)
-        } else if (false) { // LD dd, (nn)
-            null
-        } else if (false) { // LD IX, (nn)
-            null
-        } else if (false) { // LD IY, (nn)
-            null
-        } else if (opcode.value == 0b00101010) { // LD (nn), HL
+        } else if (opcode.value == 0b00101010) {
+            // LD (nn), HL
             val addr = read16BitsLowHigh(memory, pc + 1)
             Decoded(Load16HlToMem(addr), pc + 3)
-        } else if (false) { // LD (nn), dd
+        } else if (false) {
+            // LD (nn), dd
             null
-        } else if (false) { // LD (nn), IX
+        } else if (false) {
+            // LD (nn), IX
             null
-        } else if (false) { // LD (nn), IY
+        } else if (false) {
+            // LD (nn), IY
             null
-        } else if (opcode.value == 0b11111001) { // LD SP, HL
+        } else if (opcode.value == 0b11111001) {
+            // LD SP, HL
             Decoded(Load16HlToSp, pc + 1)
-        } else if (false) { // LD SP, IX
+        } else if (false) {
+            // LD SP, IX
             null
-        } else if (false) { // LD SP, IY
+        } else if (false) {
+            // LD SP, IY
             null
-        } else if (opcode.x == 0b11 && opcode.q == 0b0 && opcode.z == 0b101) { // PUSH qq
+        } else if (opcode.x == 0b11 && opcode.q == 0b0 && opcode.z == 0b101) {
+            // PUSH qq
             Decoded(Push(opcode.q), pc + 1)
-        } else if (false) { // PUSH IX
+        } else if (false) {
+            // PUSH IX
             null
-        } else if (false) { // PUSH IY
+        } else if (false) {
+            // PUSH IY
             null
-        } else if (opcode.x == 0b11 && opcode.q == 0b0 && opcode.z == 0b001) { // POP qq
+        } else if (opcode.x == 0b11 && opcode.q == 0b0 && opcode.z == 0b001) {
+            // POP qq
             Decoded(Pop(opcode.q), pc + 1)
-        } else if (false) { // POP IX
+        } else if (false) {
+            // POP IX
             null
-        } else if (false) { // POP IY
+        } else if (false) {
+            // POP IY
             null
         }
         //
@@ -155,8 +256,7 @@ fun decode(pc: Int, memory: IntArray): Decoded? {
         } else {
             null
         }
-
-    return result
+    }
 }
 
 // operand is a 3-bit value
