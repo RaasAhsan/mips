@@ -1,8 +1,23 @@
 import java.io.File
 
 /*
+ * MIPS is a load-store architecture, which means only load and store instructions can access main memory.
+ *
+ * MIPS has 32-bit addresses to access memory. Therefore there are 2^32 bytes, or 4 GiB, of addressable main memory.
+ *
  * A register file is a collection of high-speed storage cells located inside the CPU.
- * General-purpose registers and special-purpose registers (IR, PC)
+ * CPU registers can be accessed in a single CPU cycle, whereas memory accesses take several CPU cycles.
+ * General-purpose registers and special-purpose registers (IR, PC).
+ *
+ * There are only 32 registers in each file, so only 5 bits are needed to encode a register number.
+ *
+ * The general-purpose register file contains 32 32-bit GPRs, are called $0 to $31.
+ * Another floating-point register file contains 32 32-bit FPRs, called $f0 to $f31.
+ * Each register has a designated purpose.
+ *
+ * More information on registers:
+ * - https://en.wikibooks.org/wiki/MIPS_Assembly/Register_File
+ * - http://www.cs.uwm.edu/classes/cs315/Bacon/Lecture/HTML/ch05s03.html
  */
 
 class Emulator {

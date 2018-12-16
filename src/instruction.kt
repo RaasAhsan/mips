@@ -9,12 +9,31 @@
  *
  * GPR - general purpose registers
  *
- * R instructions
- * I instructions
- * J instructions
+ * A CPU instruction is a 32-bit aligned word.
+ *
+ * Immediate (I) instructions
+ * Bits 31 - 26 - opcode
+ * Bits 25 - 21 - rs
+ * Bits 20 - 16 - rt
+ * Bits 15 - 0  - immediate
+ *
+ * Jump (J) instructions
+ * Bits 31 - 26 - opcode
+ * Bits 25 - 0  - instruction
+ *
+ * Register (R) instructions
+ * Bits 31 - 26 - opcode
+ * Bits 25 - 21 - rs
+ * Bits 20 - 16 - rt
+ * Bits 15 - 11 - rd
+ * Bits 10 - 6  - sa
+ * Bits 5  - 0  - function
+ *
  */
 
 sealed class Instruction
+
+// CPU Instruction Set
 
 data class Add(rs: Int, rt: Int, rd: Int) : Instruction()
 data class Addi(rs: Int, rt: Int, immediate: Int) : Instruction()
@@ -152,3 +171,4 @@ data class Tnei(rs: Int, immediate: Int) : Instruction()
 data class Xor(rs: Int, rt: Int, rd: Int) : Instruction()
 data class Xori(rs: Int, rt: Int, immediate: Int) : Instruction()
 
+// FPU (floating-point unit) instruction set
