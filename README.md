@@ -1,6 +1,6 @@
 # mips
 
-This project provides a full-featured environment for MIPS CPUs:
+This project provides a full-featured environment for MIPS32 CPUs:
 - An assembler
 - A disassembler
 - An emulator with various mock I/O components

@@ -38,41 +38,27 @@ import java.io.File
  *
  */
 
-class Emulator {
+const val GP_INDEX = 28
+const val SP_INDEX = 29
+const val FP_INDEX = 30
+const val RA_INDEX = 31
 
-    const val GP_INDEX = 28
-    const val SP_INDEX = 29
-    const val FP_INDEX = 30
-    const val RA_INDEX = 31
+class Emulator {
 
     // 64K memory
     val memory: Memory = Memory()
 
     fun start() {
-        var done = false
-        while (!done) {
-            val decoded = decode(pc, memory)
 
-            if (decoded != null) {
-                if (decoded.instruction == Nop) {
-                    done = true
-                } else {
-                    println(decoded.instruction)
-                    pc = decoded.nextPc
-                }
-            } else {
-                done = true
-            }
-        }
     }
 
     fun loadProgram(file: String) {
-        val file = File(file)
-        val bytes = file.readBytes()
-
-        bytes.forEachIndexed { index, byte ->
-            memory[index] = byte.toInt() and 0xFF
-        }
+//        val file = File(file)
+//        val bytes = file.readBytes()
+//
+//        bytes.forEachIndexed { index, byte ->
+//            memory[index] = byte.toInt() and 0xFF
+//        }
     }
 
 }
