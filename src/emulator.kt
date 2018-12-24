@@ -45,7 +45,6 @@ const val RA_INDEX = 31
 
 class Emulator {
 
-    // 64K memory
     val memory: Memory = Memory()
 
     fun start() {
