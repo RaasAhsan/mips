@@ -8,3 +8,7 @@
 # Kotlin
 out
 lib
+
+# Gradle
+.gradle/
+
