@@ -1,11 +1,39 @@
 grammar Yagi;
 
 valAssignment
-    : VAL VARIABLE_NAME '=' expression
+    : VAL identifier '=' expression
     ;
 
 expression
+    : intExpression | booleanExpression
+    ;
+
+intExpression
+    : integer
+    ;
+
+integer
     : INT
+    ;
+
+booleanExpression
+    : boolean
+    ;
+
+boolean
+    : (true | false)
+    ;
+
+true
+    : TRUE
+    ;
+
+false
+    : FALSE
+    ;
+
+identifier
+    : IDENTIFIER
     ;
 
 INT
@@ -16,6 +44,14 @@ VAL
     : 'val'
     ;
 
-VARIABLE_NAME
-    : [A-Za-z0-9]+
+IDENTIFIER
+    : [A-Za-z] [A-Za-z0-9]*
+    ;
+
+TRUE
+    : 'true'
+    ;
+
+FALSE
+    : 'false'
     ;

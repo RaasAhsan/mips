@@ -21,8 +21,8 @@ NEWLINE : [\r\n]+ ;
 INT     : [0-9]+ ;
 
 ALPHA
-   : [A-Za-z]+
-   ;
+    : [A-Za-z]+
+    ;
 
 /* Instruction opcodes */
 
