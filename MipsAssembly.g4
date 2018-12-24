@@ -1,16 +1,30 @@
 grammar MipsAssembly;
 
-prog:	(expr NEWLINE)* ;
+prog
+    : (line NEWLINE)*
+    ;
 
-expr:	expr ('*'|'/') expr
-    |	expr ('+'|'-') expr
-    |	INT
-    |	'(' expr ')'
+line
+    : label?
+    ;
+
+label
+    : labelName ':'
+    ;
+
+labelName
+    : ALPHA
     ;
 
 NEWLINE : [\r\n]+ ;
 
 INT     : [0-9]+ ;
+
+ALPHA
+   : [A-Za-z]+
+   ;
+
+/* Instruction opcodes */
 
 ADD
     : 'add'
