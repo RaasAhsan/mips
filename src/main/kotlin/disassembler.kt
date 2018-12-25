@@ -283,10 +283,10 @@ fun decode(pc: Int, memory: IntArray): Instruction? {
 
 fun readWord(index: Int, memory: IntArray): InstructionWord {
     // Encoded as little-endian 32-bit words
-    val b0 = memory[index]
-    val b1 = memory[index + 1]
-    val b2 = memory[index + 2]
-    val b3 = memory[index + 3]
+    val b3 = memory[index]
+    val b2 = memory[index + 1]
+    val b1 = memory[index + 2]
+    val b0 = memory[index + 3]
 
     val word = (b3 shl 24) + (b2 shl 16) + (b1 shl 8) + b0
 

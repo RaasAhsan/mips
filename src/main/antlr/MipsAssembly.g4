@@ -18,7 +18,7 @@ labelName
 
 /* registers */
 
-register
+gpr
     : zero_register
     | at_register
     | v_register
