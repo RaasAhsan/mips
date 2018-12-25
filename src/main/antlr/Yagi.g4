@@ -9,7 +9,7 @@ identifier
     ;
 
 expression
-    : intExpression | booleanExpression
+    : intExpression
     ;
 
 intExpression
@@ -20,22 +20,6 @@ integer
     : INT
     ;
 
-/* no universal equality */
-booleanExpression
-    : boolean
-    ;
-
-boolean
-    : (true | false)
-    ;
-
-true
-    : TRUE
-    ;
-
-false
-    : FALSE
-    ;
 VAL
     : 'val'
     ;

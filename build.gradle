@@ -35,10 +35,20 @@ compileKotlin {
     kotlinOptions {
         jvmTarget = "1.8"
     }
+
+    dependsOn generateGrammarSource
 }
 
 compileTestKotlin {
     kotlinOptions {
         jvmTarget = "1.8"
     }
+}
+
+generateGrammarSource {
+    outputDirectory = file("src/main/java")
+}
+
+clean.doFirst {
+    delete "$rootDir/src/main/java"
 }
