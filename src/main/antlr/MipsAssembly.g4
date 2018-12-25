@@ -16,6 +16,66 @@ labelName
     : ALPHA
     ;
 
+/* registers */
+
+register
+    : zero_register
+    | at_register
+    | v_register
+    | a_register
+    | t_register
+    | s_register
+    | k_register
+    | gp_register
+    | sp_register
+    | fp_register
+    | ra_register
+    ;
+
+zero_register
+    : '$0'
+    ;
+
+at_register
+    : '$at'
+    ;
+
+v_register
+    : '$v0' | '$v1'
+    ;
+
+a_register
+    : '$a0' | '$a1' | '$a2' | '$a3'
+    ;
+
+t_register
+    : '$t0' | '$t1' | '$t2' | '$t3' | '$t4' | '$t5' | '$t6' | '$t7' | '$t8' | '$t9'
+    ;
+
+s_register
+    : '$s0' | '$s1' | '$s2' | '$s3' | '$s4' | '$s5' | '$s6' | '$s7'
+    ;
+
+k_register
+    : '$k0' | '$k1'
+    ;
+
+gp_register
+    : '$gp'
+    ;
+
+sp_register
+    : '$sp'
+    ;
+
+fp_register
+    : '$fp'
+    ;
+
+ra_register
+    : '$ra'
+    ;
+
 NEWLINE : [\r\n]+ ;
 
 INT     : [0-9]+ ;
