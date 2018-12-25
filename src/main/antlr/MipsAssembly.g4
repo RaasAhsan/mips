@@ -5,7 +5,7 @@ prog
     ;
 
 line
-    : label?
+    : instruction
     ;
 
 label
@@ -34,6 +34,13 @@ gpr
 
 immediate
     : INT
+    ;
+
+instruction
+    : add
+    | addi
+    | addiu
+    | addu
     ;
 
 add
@@ -407,10 +414,13 @@ INT
     ;
 
 COMMA
-    :','
+    : ','
     ;
 
 ALPHA
     : [A-Za-z]+
     ;
 
+WS
+    : ' ' -> skip
+    ;
