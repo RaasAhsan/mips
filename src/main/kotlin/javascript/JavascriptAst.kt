@@ -12,6 +12,8 @@ data class FunctionInvocation(val name: String, val arguments: List<Int>)
 
 data class Return(val expression: Int)
 
+// Arithmetic
+
 data class Add(val n: Int)
 
 data class Multiply(val n: Int)
