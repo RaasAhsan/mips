@@ -157,7 +157,7 @@ const val FUNCTION_DERET = 0b011111
 const val FUNCTION_ERET  = 0b011000
 
 
-fun decode(pc: Int, memory: IntArray): Instruction? {
+fun decode(pc: Int, memory: IntArray): MipsInstruction? {
     val i = readWord(pc, memory)
 
     return when (i.opcode) {

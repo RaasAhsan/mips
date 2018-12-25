@@ -5,7 +5,7 @@ import java.io.File
  * A CPU is a physical implementation of an instruction set architecture. Ryzen chips are amd64 CPUs.
  * A microprocessor is a CPU within a single chip.
  *
- * MIPS is a RISC (Reduced Instruction Set Computer), which means that there are generally fewer CPU cycles per instruction.
+ * MIPS is a RISC (Reduced MipsInstruction Set Computer), which means that there are generally fewer CPU cycles per instruction.
  * MIPS is a load-store architecture, which means only load and store instructions access main memory. Common for RISCs.
  * The remaining logical instructions that are performed by the ALU only operate on registers.
  * It is a register machine, which means that it uses a collection of registers to perform operations (as opposed to a stack machine).
